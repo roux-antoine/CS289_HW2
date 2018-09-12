@@ -17,69 +17,56 @@ def main():
     y_fresh = np.array(data['y_fresh']).T
 
 
-    n = 20  # max degree
+    max_deg = 20  # max degree
     # err_train = np.zeros(n - 1)
     # err_fresh = np.zeros(n - 1)
 
-    err_train = np.zeros(n)
-    err_fresh = np.zeros(n)
+    err_train_full = np.zeros(max_deg)
+    err_fresh_full = np.zeros(max_deg)
+    err_train = np.zeros(max_deg-1)
+    err_fresh = np.zeros(max_deg-1)
+
 
     ## Training
-    coeff = np.zeros((len(x_train), n))
+    coeff = np.zeros((max_deg, len(x_train)))
 
     #degree 0
     coeff[0,0] = np.mean(y_train)
-    err_train[0] = np.sum((x_train - np.ones(20)*coeff[0,0])*(x_train - np.ones(20)*coeff[0,0]))
+    err_train_full[0] = np.average((x_train - np.ones(20)*coeff[0,0])**2)
 
     #degree 1
     X = np.array([x_train, np.ones(len(x_train))]).flatten()
     A = X.reshape(20,2, order='F')
     coeff[1,0:2] = lstsq(A, y_train)[::-1]
-
     y_pred = np.zeros(len(x_train))
     for i in range(len(x_train)):
         y_pred[i] = np.dot(A[i], coeff[1][0:2])
-
-    err_train[1] = np.sum((y_pred - y_train)*(y_pred - y_train))
+    err_train_full[1] = np.average((y_pred - y_train)**2)
 
     #degree > 1
-    for k in range(2, n):
+    for deg in range(2, max_deg):
         X = np.append(X[0:len(x_train)]*x_train, X)
-        A = X.reshape(20,k+1, order='F')
-        coeff[k, 0:k+1] = lstsq(A, y_train)[::-1]
+        A = X.reshape(20,deg+1, order='F')
+        coeff[deg, 0:deg+1] = lstsq(A, y_train)[::-1]
 
-    #la matrice A a l'air bien construite
+    ## computation of the trainig error
+    for deg in range(max_deg):
+        y_pred = A @ coeff[deg][::-1]
+        err_train_full[deg] = np.average(np.array(y_train-y_pred)**2)
+        err_fresh_full[deg] = np.average(np.array(y_fresh-y_pred)**2)
 
-    ## computation of the training error
-    for k in range(n):
-        y_pred = np.zeros(len(x_train))
-        for i in range(len(x_train)):
-            y_pred[i] = np.dot(A[i], coeff[k][::-1])
-        # plt.plot(x_train, y_pred)
-        # plt.plot(x_train, y_train)
-        # plt.show()
-        err_train[k] = np.sum(np.array(y_train-y_pred)*np.array(y_train-y_pred))
-
-
-    ## computation of the 'fresh' error
-
-    for k in range(n):
-        y_pred = np.zeros(len(x_train))
-        for i in range(len(x_train)):
-            y_pred[i] = np.dot(A[i], coeff[k][::-1])
-        # plt.plot(x_train, y_pred)
-        # plt.plot(x_train, y_fresh)
-        # plt.title(k)
-        # plt.show()
-        err_fresh[k] = np.sum(np.array(y_fresh-y_pred)*np.array(y_fresh-y_pred))
+    err_train = err_train_full[1:]
+    err_fresh = err_fresh_full[1:]
 
     plt.figure()
-    plt.plot(err_train, label = 'train')
-    plt.plot(err_fresh, label = 'fresh')
+    plt.plot(range(1, max_deg), err_train, label = 'train')
+    plt.plot(range(1, max_deg), err_fresh, label = 'fresh')
     plt.title('Evolution of training and validation error')
     plt.xlabel('max degree of polynomial')
     plt.ylabel('average error')
+    plt.legend()
     plt.semilogy()
+    plt.grid()
     plt.show()
 
     # plt.figure()

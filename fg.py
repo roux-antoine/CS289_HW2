@@ -10,7 +10,7 @@ KD = 6  # max D = 6
 LAMBDA = [0, 0.05, 0.1, 0.15, 0.2]
 
 nb_features_ini = 5
-newcomers_size = [15, 35, 70, 126, 210]
+newcomers_size = [5, 15, 35, 70, 126, 210]
 newcomers_index = [1, 5, 20, 55, 125, 251]
 
 
@@ -19,15 +19,15 @@ def fit(D, lambda_):
     pass
 
 def build_X(D, X):
-    someMatrix = np.zeros((data_x.shape[0], newcomers_size[D-1]))
+    someMatrix = np.zeros((data_x.shape[0], newcomers_size[D]))
     for k in range(data_x.shape[0]):
         print(k)
         newcomers = np.array([])
         previous_newcomers = X[k, newcomers_index[D-1]:]
-        for i in range(newcomers_size[D-1]):
-            for j in range(i, nb_features_ini):
+        for i in range(nb_features_ini):
+            for j in range(i, newcomers_size[D-1]):
                 newcomers = np.append(newcomers, data_x[k, i] * previous_newcomers[j])
-        # print(newcomers)
+        print(newcomers.shape)
         # print(len(someMatrix[k]))
         # print(someMatrix.shape)
         someMatrix[k] = newcomers
@@ -45,8 +45,8 @@ def main():
         X = build_X(D, X)
         print(X.shape)
         print(X[0])
-        for i in range(len(LAMBDA)):
-            Etrain[D, i], Evalid[D, i] = fit(D + 1, LAMBDA[i])
+        # for i in range(len(LAMBDA)):
+        #     Etrain[D, i], Evalid[D, i] = fit(D + 1, LAMBDA[i])
 
     print('Average train error:', Etrain, sep='\n')
     print('Average valid error:', Evalid, sep='\n')

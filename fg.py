@@ -34,8 +34,6 @@ def build_X(D, X):
     return np.c_[X, someMatrix]
 
 
-
-
 def main():
     np.set_printoptions(precision=11)
     Etrain = np.zeros((KD, len(LAMBDA)))

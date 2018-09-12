@@ -58,27 +58,82 @@ def fit(D, lambda_):
 #         someMatrix[k] = newcomers
 #     return np.c_[X, someMatrix]
 
-def assemble_feature(x, D):
-    n_feature = x.shape[1]
-    Q = [(np.ones(x.shape[0]), 0, 0)]
-    # print(Q)
-    i = 0
-    # print(Q[0])
-    while Q[i][1] < D:
-        cx, degree, last_index = Q[i]
-        for j in range(last_index, n_feature):
-            Q.append((cx * x[:, j], degree + 1, j))
-        # print(Q)
-        i += 1
-    return np.column_stack([q[0] for q in Q])
-
-
 # def assemble_feature(x, D):
-#     if D == 1:
-#         someMatrix = np.ones(data_x.shape[0])
-#         return np.c_[someMatrix, x]
+#     n_feature = x.shape[1]
+#     Q = [(np.ones(x.shape[0]), 0, 0)]
+#     # print(Q)
+#     i = 0
+#     # print(Q[0])
+#     while Q[i][1] < D:
+#         cx, degree, last_index = Q[i]
+#         for j in range(last_index, n_feature):
+#             Q.append((cx * x[:, j], degree + 1, j))
+#         # print(Q)
+#         i += 1
+#     return np.column_stack([q[0] for q in Q])
 
-    # someMatrix = np.zeros((data_x.shape[0], newcomers_size[D-1]))
+
+def assemble_feature(x, D):
+    if D == 1:
+        someMatrix = np.ones(data_x.shape[0])
+        return np.c_[someMatrix, x]
+
+    elif D == 2:
+        someMatrix = np.zeros((data_x.shape[0], newcomers_size[D-1]))
+        for a in range(data_x.shape[0]):
+            newcomers = []
+            for i in range(nb_features_ini):
+                for j in range(i, nb_features_ini):
+                    newcomers.append(data_x[a][i]*data_x[a][j])
+            someMatrix[a] = np.array(newcomers)
+        return np.c_[x, someMatrix]
+    elif D == 3:
+        someMatrix = np.zeros((data_x.shape[0], newcomers_size[D-1]))
+        for a in range(data_x.shape[0]):
+            newcomers = []
+            for i in range(nb_features_ini):
+                for j in range(i, nb_features_ini):
+                    for k in range(j, nb_features_ini):
+                        newcomers.append(data_x[a][i]*data_x[a][j]*data_x[a][k])
+            someMatrix[a] = np.array(newcomers)
+        return np.c_[x, someMatrix]
+    elif D == 4:
+        someMatrix = np.zeros((data_x.shape[0], newcomers_size[D-1]))
+        for a in range(data_x.shape[0]):
+            newcomers = []
+            for i in range(nb_features_ini):
+                for j in range(i, nb_features_ini):
+                    for k in range(j, nb_features_ini):
+                        for l in range(k, nb_features_ini):
+                            newcomers.append(data_x[a][k]*data_x[a][i]*data_x[a][j]*data_x[a][l])
+            someMatrix[a] = np.array(newcomers)
+        return np.c_[x, someMatrix]
+    elif D == 5:
+        someMatrix = np.zeros((data_x.shape[0], newcomers_size[D-1]))
+        for a in range(data_x.shape[0]):
+            newcomers = []
+            for i in range(nb_features_ini):
+                for j in range(i, nb_features_ini):
+                    for k in range(j, nb_features_ini):
+                        for l in range(k, nb_features_ini):
+                            for m in range(l, nb_features_ini):
+                                newcomers.append(data_x[a][k]*data_x[a][i]*data_x[a][j]*data_x[a][l]*data_x[a][m])
+            someMatrix[a] = np.array(newcomers)
+        return np.c_[x, someMatrix]
+    elif D == 6:
+        someMatrix = np.zeros((data_x.shape[0], newcomers_size[D-1]))
+        for a in range(data_x.shape[0]):
+            newcomers = []
+            for i in range(nb_features_ini):
+                for j in range(i, nb_features_ini):
+                    for k in range(j, nb_features_ini):
+                        for l in range(k, nb_features_ini):
+                            for m in range(l, nb_features_ini):
+                                for n in range(m, nb_features_ini):
+                                    newcomers.append(data_x[a][k]*data_x[a][i]*data_x[a][j]*data_x[a][l]*data_x[a][m]*data_x[a][n])
+            someMatrix[a] = np.array(newcomers)
+        return np.c_[x, someMatrix]
+
 
 
 def main():
@@ -87,10 +142,12 @@ def main():
     Evalid = np.zeros((KD, len(LAMBDA)))
     X = np.c_[np.ones(data_x.shape[0]), data_x]
 
+    global feat_x
+    feat_x = data_x
     for D in range(1, KD+1):
         print(D)
-        global feat_x
-        feat_x = assemble_feature(data_x, D + 1)
+        feat_x = assemble_feature(feat_x, D)
+        print(np.sum(feat_x[0]))
 
         for i in range(len(LAMBDA)):
             Etrain[D-1, i], Evalid[D-1, i] = fit(D + 1, LAMBDA[i])

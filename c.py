@@ -16,13 +16,10 @@ def main():
     y_train = np.array(data['y_train']).T
     y_fresh = np.array(data['y_fresh']).T
 
-
     max_deg = 20  # max degree
-    # err_train = np.zeros(n - 1)
-    # err_fresh = np.zeros(n - 1)
 
-    err_train_full = np.zeros(max_deg)
-    err_fresh_full = np.zeros(max_deg)
+    err_train_full = np.zeros(max_deg) #in this one we consider the degree 0
+    err_fresh_full = np.zeros(max_deg) #in this one we consider the degree 0
     err_train = np.zeros(max_deg-1)
     err_fresh = np.zeros(max_deg-1)
 
@@ -58,23 +55,18 @@ def main():
     err_train = err_train_full[1:]
     err_fresh = err_fresh_full[1:]
 
+    print('Best degree of polynomial: ', np.argmin(err_fresh)+1)
+
     plt.figure()
-    plt.plot(range(1, max_deg), err_train, label = 'train')
-    plt.plot(range(1, max_deg), err_fresh, label = 'fresh')
+    plt.ylim([0, 6])
+    plt.plot(range(1, max_deg), err_train, label='train')
+    plt.plot(range(1, max_deg), err_fresh, label='fresh')
     plt.title('Evolution of training and validation error')
     plt.xlabel('max degree of polynomial')
     plt.ylabel('average error')
     plt.legend()
-    plt.semilogy()
     plt.grid()
     plt.show()
-
-    # plt.figure()
-    # plt.ylim([0, 6])
-    # plt.plot(err_train, label='train')
-    # plt.plot(err_fresh, label='fresh')
-    # plt.legend()
-    # plt.show()
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ def main():
 
     max_deg = 20  # max degree
 
-    err_train_full = np.zeros(max_deg)
+    err_train_full = np.zeros(max_deg) #in this one we consider the degree 0
     err_train = np.zeros(max_deg-1)
 
     ## Training
@@ -43,13 +43,13 @@ def main():
 
     ## computation of the trainig error
     for deg in range(max_deg):
-        # plt.subplot(4,5,deg+1)
         y_pred = A @ coeff[deg][::-1]
+        err_train_full[deg] = np.average(np.array(y_train-y_pred)**2)
+        # plt.subplot(4,5,deg+1)
         # plt.plot(x_train, y_pred)
         # plt.plot(x_train, y_train)
         # plt.grid()
         # plt.title(deg)
-        err_train_full[deg] = np.average(np.array(y_train-y_pred)**2)
 
     err_train = err_train_full[1:]
 

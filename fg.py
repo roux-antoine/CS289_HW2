@@ -9,6 +9,7 @@ data_y = data['y']
 Kc = 4  # 4-fold cross validation
 KD = 6  # max D = 6
 LAMBDA = [0, 0.05, 0.1, 0.15, 0.2]
+# LAMBDA = [0.1]
 
 nb_features_ini = 5
 nb_points = data_x.shape[0]
@@ -37,10 +38,11 @@ def fit(D, lambda_):
         E_train[k] = np.mean((y - X @ alpha)*(y - X @ alpha))
         E_valid[k] = np.mean((y_folds[(k+3)%Kc] - x_folds[(k+3)%Kc] @ alpha)*(y_folds[(k+3)%Kc] - x_folds[(k+3)%Kc] @ alpha))
 
-    return ( (1/Kc)* np.sum(E_train), (1/Kc)* np.sum(E_valid) )
+    return (np.average(E_train), np.average(E_valid))
 
 
 def create_x(x, D):
+    #it is not the most effective way to build x but I could not find better at the moment
     if D == 1:
         someMatrix = np.ones(nb_points)
         return np.c_[someMatrix, x]
@@ -153,10 +155,9 @@ def main():
             min = np.min(Evalid[:,k])
             argmin_lambda = k
     print('lambda opt = ', LAMBDA[argmin_lambda])
-
     # print('TIME: ', time.time()-start)
 
-    #we could do a last learning with these parameters on the whole set
+    #we could do now a last learning with these parameters on the whole set
 
 
 if __name__ == "__main__":
